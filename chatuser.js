@@ -26,6 +26,7 @@ class ChatUser {
    * */
 
   send(data) {
+    console.log(data);
     try {
       this._send(data);
     } catch {
@@ -76,10 +77,15 @@ class ChatUser {
     if (msg.type === "join") this.handleJoin(msg.name);
     else if (msg.type === "chat") {
       if(msg.text === "/joke") {
-        this.handleChat("Why don't seagulls fly over the bay? \
-        Because then they'd be bagels!");
+        this.send(JSON.stringify({
+            name: this.name,
+            type: "chat",
+            text: "Why don't seagulls fly over the bay? \
+        Because then they'd be bagels!"
+        }));
+      }else{
+        this.handleChat(msg.text);
       }
-      this.handleChat(msg.text);
     }
     else throw new Error(`bad message: ${msg.type}`);
   }
