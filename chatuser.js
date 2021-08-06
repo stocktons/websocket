@@ -77,17 +77,40 @@ class ChatUser {
     if (msg.type === "join") this.handleJoin(msg.name);
     else if (msg.type === "chat") {
       if(msg.text === "/joke") {
-        this.send(JSON.stringify({
-            name: this.name,
-            type: "chat",
-            text: "Why don't seagulls fly over the bay? \
-        Because then they'd be bagels!"
-        }));
+        this.joke();
+      }else if(msg.text === "/members"){
+        this.listMembers()
       }else{
         this.handleChat(msg.text);
       }
     }
     else throw new Error(`bad message: ${msg.type}`);
+  }
+  
+  /* 
+  * sends a joke to this user.
+  */
+  joke(){
+    this.send(JSON.stringify({
+      name: this.name,
+      type: "note",
+      text: "Why don't seagulls fly over the bay? \
+      Because then they'd be bagels!"
+      }));
+  }
+  
+  /* 
+  * List the members connected to this room
+  */
+  listMembers(){
+    console.log(Array.from(this.room.members)[0].name);
+    let names = Array.from(this.room.members).map( ele => ele.name);
+    let nameList = names.join("</br>");
+    this.send(JSON.stringify({
+      name: this.name,
+      type: "note",
+      text: `${nameList}`
+      }));
   }
 
   /** Connection was closed: leave room, announce exit to others. */
