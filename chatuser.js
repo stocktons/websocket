@@ -78,9 +78,11 @@ class ChatUser {
     else if (msg.type === "chat") {
       if(msg.text === "/joke") {
         this.joke();
-      }else if(msg.text === "/members"){
-        this.listMembers()
-      }else{
+      } else if(msg.text === "/members"){
+        this.listMembers();
+      } else if(msg.text.startsWith("/direct")){
+        this.direct(msg.text);
+      } else {
         this.handleChat(msg.text);
       }
     }
@@ -103,7 +105,6 @@ class ChatUser {
   * List the members connected to this room
   */
   listMembers(){
-    console.log(Array.from(this.room.members)[0].name);
     let names = Array.from(this.room.members).map( ele => ele.name);
     let nameList = names.join("</br>");
     this.send(JSON.stringify({
@@ -112,6 +113,32 @@ class ChatUser {
       text: `${nameList}`
       }));
   }
+
+  /* 
+  * Slide into someone's DMs
+  * message = "/direct username message"
+  * 
+  * Get the recipient's user instance, 
+  */
+
+  direct(msg) {
+    let message = msg;
+    console.log(msg, "THIS IS THE MESSAGE");
+    let recipientName = message.split(" ")[1];
+    let usersNames = Array.from(this.room.members).map(ele => ele.name);
+    let recipientIdx = usersNames.indexOf(recipientName);
+
+    if (usersNames.includes(recipientName)) {
+      let recipient = Array.from(this.room.members)[recipientIdx];
+      let dm = message.split(" ").splice(2).join(" ");
+      recipient.send(JSON.stringify({
+        name: this.name,
+        type: "chat",
+        text: `${dm}`
+      }));
+    }
+  }
+
 
   /** Connection was closed: leave room, announce exit to others. */
 
